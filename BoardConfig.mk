@@ -86,10 +86,10 @@ BOARD_AVB_RECOVERY_ROLLBACK_INDEX := 1
 BOARD_AVB_RECOVERY_ROLLBACK_INDEX_LOCATION := 1
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flag 2
 
-# Anti roolback
-PLATFORM_SECURITY_PATCH := 2099-12-31
-VENDOR_SECURITY_PATCH := 2099-12-31
-PLATFORM_VERSION := 16.1.0
+# Security Patch (S9)
+PLATFORM_SECURITY_PATCH := 2025-12-01
+VENDOR_SECURITY_PATCH := 2025-12-01
+PLATFORM_VERSION := 13
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
 # Crypto-Decryption
@@ -127,6 +127,8 @@ TARGET_RECOVERY_DEVICE_MODULES += \
 TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_SHARED_LIBRARIES)/libtrusty \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libtrusty \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libtrustyHalHelper \
+    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libtrustyHalHelper \
     $(TARGET_OUT_SHARED_LIBRARIES)/libgatekeeper \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libgatekeeper \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.security.keymint-V2-ndk \
@@ -139,6 +141,8 @@ TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/lib_android_keymaster_keymint_utils  \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymint \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libkeymint  \
+    $(TARGET_OUT_SHARED_LIBRARIES)/libkernelbootcp.trusty \
+    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libkernelbootcp.trusty  \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_messages \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libkeymaster_messages \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.gatekeeper@1.0 \
@@ -171,6 +175,8 @@ $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.security.sharedsecret-V1-ndk.so 
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libkeymaster_messages.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/android.hardware.gatekeeper@1.0.so \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/android.hardware.gatekeeper@1.0.so \
+    $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/vendor.sprd.hardware.trusty@1.0.so \
+    $(TARGET_OUT_SHARED_LIBRARIES)/vendor.sprd.hardware.trusty@1.0.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libcppbor_external.so \
     $(TARGET_OUT_VENDOR_SHARED_LIBRARIES)/libcppbor_external.so \
     $(TARGET_OUT_SHARED_LIBRARIES)/libkeymaster_messages.so \

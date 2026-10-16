@@ -2,14 +2,14 @@
 
 load_panel()
 {
-        insmod /vendor/lib/nt36xxx_ss.ko
-        insmod /vendor/lib/chipone-tddi_ss.ko
-        insmod /vendor/lib/chipone-tddi.ko
-        insmod /vendor/lib/gcore_ss.ko
-        insmod /vendor/lib/gcore_7202h.ko
-        insmod /vendor/lib/ilitek-tddi.ko
-        insmod /vendor/lib/focaltech_ts.ko
-        insmod /vendor/lib/tcs3430.ko
+        insmod /vendor/lib/modules/nt36xxx_ss.ko
+        insmod /vendor/lib/modules/chipone-tddi_ss.ko
+        insmod /vendor/lib/modules/chipone-tddi.ko
+        insmod /vendor/lib/modules/gcore_ss.ko
+        insmod /vendor/lib/modules/gcore_7202h.ko
+        insmod /vendor/lib/modules/ilitek-tddi.ko
+        insmod /vendor/lib/modules/focaltech_ts.ko
+        insmod /vendor/lib/modules/tcs3430.ko
 
         # default
         chown system system /dev/tspio

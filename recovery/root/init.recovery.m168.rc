@@ -3,27 +3,36 @@ import /init.recovery.common.rc
 import /init.recovery.samsung.rc
 
 on early-init
-   start load_touchscreen_modules
-   start load_flashlight_modules
+    mkdir /tmp/sprd_ss 0770 root system
+    mkdir /tmp/sprd_tee_ss 0770 root system
+    restorecon /dev/trusty-ipc-dev0
+    chown root system /dev/trusty-ipc-dev0
+    chmod 0666 /dev/trusty-ipc-dev0
+    chown root system /dev/rpmb0
+    chmod 0660 /dev/rpmb0
+    start load_touchscreen_modules
+    start load_flashlight_modules
 
-on fs
-    start prepdecrypt 
+on late-init
+    mkdir /tmp/misc 0770 root keystore
+    mkdir /tmp/misc/keystore 0770 root keystore
+    start tee-rpc
+    start trusty-sprd
+    start rpmbproxy
+    start nsproxy
+    start teensproxy
+    start crypto-storage-wait
 
 on boot
-    install_keyring
-    start keymint-1-0
-    start gatekeeper-1-0
     start health-hal-2-1
 
-on property:vendor.sys.listener.registered=true
-    start keymint-1-0
-    start gatekeeper-1-0
+# note twrp.super.symlinks_created never set
+on property:twrp.super.symlinks_created=true
+    start prepdecrypt
 
-on property:crypto.ready=1 && property:ro.crypto.state=encrypted
-    start keymint-1-0
-    start gatekeeper-1-0
-
-on property:crypto.ready=1 && property:hwservicemanager.ready=true
+# note twrp.crypto.storage.ready never set
+on property:twrp.crypto.storage.ready=1 && property:twrp.prepdecrypt.ready=1 && property:ro.crypto.state=encrypted
+    install_keyring
     start keymint-1-0
     start gatekeeper-1-0
 
@@ -46,19 +55,71 @@ service prepdecrypt /system/bin/prepdecrypt.sh
     group root
     seclabel u:r:recovery:s0
 
-service keystore2 /system/bin/keystore2 /data/misc/keystore
+service rpmbserver /vendor/bin/rpmbserver -r /dev/rpmb0
+    class core
+    socket rpmbserver stream 0666 system system
     user root
-    group root
-    disabled
+    group root system
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_RAWIO SETUID SETGID
     seclabel u:r:recovery:s0
+    disabled
 
-service keymint-1-0 /system/bin/hw/android.hardware.security.keymint@1.0-unisoc.service
+service trusty-sprd /vendor/bin/hw/vendor.sprd.hardware.trusty@1.0-service
+    class hal
+    user root
+    group root system
+    seclabel u:r:recovery:s0
+    disabled
+
+service tee-rpc /vendor/bin/tee_rpc
+    class core
+    user root
+    group root system
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_RAWIO SETUID SETGID
+    seclabel u:r:recovery:s0
+    disabled
+
+# note wait_storage_crypto.sh not symlinks_created
+service crypto-storage-wait /system/bin/sh /wait_storage_crypto.sh
+    class core
+    user root
+    group root system
+    seclabel u:r:recovery:s0
+    disabled
+    oneshot
+
+service rpmbproxy /vendor/bin/sprdstorageproxyd -f rpmb -d /dev/trusty-ipc-dev0 -p /tmp/sprd_ss
+    class core
+    user root
+    group root system
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_RAWIO SETUID SETGID
+    seclabel u:r:recovery:s0
+    disabled
+    oneshot
+
+service nsproxy /vendor/bin/sprdstorageproxyd -f ns -d /dev/trusty-ipc-dev0 -p /tmp/sprd_ss
+    class core
+    user root
+    group root system
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_RAWIO SETUID SETGID
+    seclabel u:r:recovery:s0
+    disabled
+
+service teensproxy /vendor/bin/sprdstorageproxyd -f teens -d /dev/trusty-ipc-dev0 -p /tmp/sprd_tee_ss
+    class core
+    user root
+    group root system
+    capabilities DAC_OVERRIDE DAC_READ_SEARCH SYS_RAWIO SETUID SETGID
+    seclabel u:r:recovery:s0
+    disabled
+
+service keymint-1-0 /vendor/bin/hw/android.hardware.security.keymint@1.0-unisoc.service
     user root
     group root drmrpc
     disabled
     seclabel u:r:recovery:s0
 
-service gatekeeper-1-0 /system/bin/hw/android.hardware.gatekeeper@1.0-service.trusty
+service gatekeeper-1-0 /vendor/bin/hw/android.hardware.gatekeeper@1.0-service.trusty
     user root
     group root
     disabled
